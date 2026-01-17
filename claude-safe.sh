@@ -3,10 +3,13 @@ set -e
 
 PROJECT_DIR="${1:-$(pwd)}"
 
-if [ "$PROJECT_DIR" = "/" ] || [ "$PROJECT_DIR" = "$HOME" ]; then
-    echo "❌ Mounting sensitive directories (/, ~) is not allowed"
-    exit 1
-fi
+BLOCKED_PATHS=("/" "$HOME" "/etc" "/var" "/usr" "/bin" "/sbin" "/lib" "/lib64" "/opt" "/sys" "/proc" "/dev" "/boot" "/root")
+for blocked in "${BLOCKED_PATHS[@]}"; do
+    if [ "$PROJECT_DIR" = "$blocked" ]; then
+        echo "❌ Mounting $blocked is not allowed for security reasons"
+        exit 1
+    fi
+done
 
 if [ ! -d "$PROJECT_DIR" ]; then
     echo "❌ Directory not found: $PROJECT_DIR"
@@ -24,7 +27,13 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-docker volume create claude-data > /dev/null 2>&1 || true
+if ! docker volume create claude-data > /dev/null 2>&1; then
+    # Volume likely already exists, which is fine
+    if ! docker volume inspect claude-data > /dev/null 2>&1; then
+        echo "❌ Failed to create or access Docker volume 'claude-data'"
+        exit 1
+    fi
+fi
 
 DOCKER_ARGS=(
     -it --rm

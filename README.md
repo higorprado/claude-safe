@@ -98,6 +98,24 @@ claude-safe ~/Code/another-project
 *   **Git Integration**: Mounts your host's `~/.gitconfig` in read-only mode, allowing Claude to make commits using your name and email.
 *   **Network**: Shares the host network stack to allow low-latency API communication.
 
+## Security Considerations
+
+Claude Safe provides **filesystem isolation**, not complete sandboxing:
+
+| Layer | Isolated? | Details |
+|-------|-----------|---------|
+| Filesystem | Yes | Container can only access the mounted project directory |
+| System directories | Yes | Sensitive paths (`/etc`, `/var`, `/usr`, etc.) cannot be mounted |
+| Network | No | Uses `--network host` for optimal API latency |
+
+**Why host networking?** Claude Code makes frequent API calls to Claude's servers. Using Docker's bridge network adds latency to every request. Host networking provides the same network performance as running Claude Code directly on your machine.
+
+**What this means:** While the AI cannot read or modify files outside your project directory, it has the same network access as any process on your host. This is intentional and mirrors how Claude Code would behave if run directly on your machine.
+
+### Alternative: Bridge Network Mode
+
+If you prefer complete network isolation, you can modify `claude-safe.sh` by removing the `--network host` line. Note that this will increase API call latency by 10-30ms per request.
+
 ## Troubleshooting
 
 **"Unexpected end of JSON input"**
