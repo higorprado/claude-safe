@@ -1,6 +1,7 @@
 # Claude Safe
+![CI Status](https://github.com/higorprado/claude-safe/actions/workflows/ci.yml/badge.svg)
 
-Run **Claude Code** in a fully isolated, persistent, and secure Docker container. Protect your Mac from unwanted system modifications while maintaining your authentication session and Git identity.
+Run **Claude Code** in a fully isolated, persistent, and secure Docker container. Designed specifically for macOS to protect your system from unwanted system modifications while maintaining your authentication session and Git identity.
 
 ## Why?
 

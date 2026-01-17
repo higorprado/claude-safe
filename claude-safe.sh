@@ -3,7 +3,25 @@ set -e
 
 PROJECT_DIR="${1:-$(pwd)}"
 
-BLOCKED_PATHS=("/" "$HOME" "/etc" "/var" "/usr" "/bin" "/sbin" "/lib" "/lib64" "/opt" "/sys" "/proc" "/dev" "/boot" "/root")
+BLOCKED_PATHS=(
+    "/" 
+    "$HOME" 
+    "/Applications" 
+    "/Library" 
+    "/System" 
+    "/Users" 
+    "/Volumes" 
+    "/bin" 
+    "/dev" 
+    "/etc" 
+    "/net" 
+    "/opt" 
+    "/private" 
+    "/sbin" 
+    "/usr" 
+    "/var"
+)
+
 for blocked in "${BLOCKED_PATHS[@]}"; do
     if [ "$PROJECT_DIR" = "$blocked" ]; then
         echo "❌ Mounting $blocked is not allowed for security reasons"
