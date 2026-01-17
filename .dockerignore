@@ -1,0 +1,9 @@
+.git
+.DS_Store
+*.log
+node_modules
+.idea
+.vscode
+README.md
+install.sh
+claude-safe.sh
