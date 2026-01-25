@@ -3,24 +3,49 @@ set -e
 
 PROJECT_DIR="${1:-$(pwd)}"
 
+# Common blocked paths for all platforms
 BLOCKED_PATHS=(
-    "/" 
-    "$HOME" 
-    "/Applications" 
-    "/Library" 
-    "/System" 
-    "/Users" 
-    "/Volumes" 
-    "/bin" 
-    "/dev" 
-    "/etc" 
-    "/net" 
-    "/opt" 
-    "/private" 
-    "/sbin" 
-    "/usr" 
+    "/"
+    "$HOME"
+    "/bin"
+    "/boot"
+    "/dev"
+    "/etc"
+    "/lib"
+    "/lib64"
+    "/opt"
+    "/proc"
+    "/root"
+    "/run"
+    "/sbin"
+    "/srv"
+    "/sys"
+    "/tmp"
+    "/usr"
     "/var"
 )
+
+# Add platform-specific blocked paths
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS-specific paths
+    BLOCKED_PATHS+=(
+        "/Applications"
+        "/Library"
+        "/System"
+        "/Users"
+        "/Volumes"
+        "/net"
+        "/private"
+    )
+else
+    # Linux-specific paths (includes WSL)
+    BLOCKED_PATHS+=(
+        "/home"
+        "/mnt"
+        "/media"
+        "/snap"
+    )
+fi
 
 for blocked in "${BLOCKED_PATHS[@]}"; do
     if [ "$PROJECT_DIR" = "$blocked" ]; then
