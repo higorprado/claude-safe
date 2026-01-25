@@ -44,7 +44,6 @@ link_folder "$USER_HOME/.claude" "dot_claude"
 link_folder "$USER_HOME/.local/state" "local_state"
 link_folder "$USER_HOME/.local/share" "local_share"
 link_folder "$USER_HOME/.cache" "cache_root"
-link_folder "$USER_HOME/.npm" "npm_cache" 
 link_file   "$USER_HOME/.claude.json" "claude_token.json"
 
 chown -R "$USERNAME:$USERNAME" "$PERSIST_DIR"
