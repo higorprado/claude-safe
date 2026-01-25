@@ -9,13 +9,13 @@ RUN apt-get update && \
     python3 \
     python3-pip \
     nodejs \
-    npm \
     vim \
     gosu \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g @anthropic-ai/claude-code --unsafe-perm=true --allow-root
+RUN curl -fsSL https://claude.ai/install.sh | bash && \
+    cp -L /root/.local/bin/claude /usr/local/bin/claude
 
 RUN userdel -r ubuntu || true
 
