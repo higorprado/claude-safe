@@ -1,11 +1,11 @@
 # Claude Safe
 ![CI Status](https://github.com/higorprado/claude-safe/actions/workflows/ci.yml/badge.svg)
 
-Run **Claude Code** in a fully isolated, persistent, and secure Docker container. Designed specifically for macOS to protect your system from unwanted system modifications while maintaining your authentication session and Git identity.
+Run **Claude Code** in a fully isolated, persistent, and secure Docker container. Works on **macOS**, **Linux**, and **WSL** to protect your system from unwanted modifications while maintaining your authentication session and Git identity.
 
 ## Why?
 
-Claude Code is an autonomous AI agent capable of editing files and running commands. Running it directly on your host machine (Mac) gives it access to your entire system.
+Claude Code is an autonomous AI agent capable of editing files and running commands. Running it directly on your host machine gives it access to your entire system.
 
 **Claude Safe** creates a sandboxed Ubuntu environment that:
 1.  **Isolates Execution**: The AI can only see and modify the specific project directory you mount.
@@ -16,7 +16,7 @@ Claude Code is an autonomous AI agent capable of editing files and running comma
 
 ## Prerequisites
 
-- **Docker Desktop** (must be running)
+- **Docker** (Docker Desktop on macOS/Windows, or Docker Engine on Linux)
 - **Claude.ai Account** (Pro or Team subscription recommended)
 
 ## Installation
@@ -51,7 +51,7 @@ You need to authenticate **inside** the container once. The credentials will be 
    claude auth login
    ```
 
-3. **Copy the URL** provided in the terminal and open it in your Mac's browser to authorize.
+3. **Copy the URL** provided in the terminal and open it in your browser to authorize.
 
 4. Once authorized, verify it works:
    ```bash
@@ -68,7 +68,7 @@ Your session is now saved. You won't need to log in again.
 
 ## Usage
 
-Navigate to any project on your Mac and run:
+Navigate to any project directory and run:
 
 ```bash
 cd ~/Code/my-cool-project
@@ -83,7 +83,7 @@ claude "Analyze this project and suggest refactoring"
 claude "Fix the bug in main.py"
 ```
 
-Any changes Claude makes are reflected immediately in your Mac's file system (in that specific folder only).
+Any changes Claude makes are reflected immediately in your host file system (in that specific folder only).
 
 ### Run on a specific path
 You can also specify the target directory:
@@ -127,7 +127,7 @@ docker volume rm claude-data
 Then run `claude-safe` again. The system will auto-repair the configuration.
 
 **"Docker daemon is not running"**
-Make sure Docker Desktop is open and running on your Mac.
+Make sure Docker is running. On macOS/Windows, open Docker Desktop. On Linux, ensure the Docker service is started (`sudo systemctl start docker`).
 
 ## Uninstall
 
