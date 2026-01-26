@@ -236,8 +236,8 @@ start_module_container() {
         local port=$(echo "$MODULE_MCP_URL" | sed -n 's|.*://[^:]*:\([0-9]*\).*|\1|p')
         local retries=30
         while [ $retries -gt 0 ]; do
-            # Check if port is open (works for SSE endpoints that stream forever)
-            if nc -z localhost "$port" 2>/dev/null; then
+            # Check if port is open using bash's built-in /dev/tcp (no external tools needed)
+            if (echo > /dev/tcp/localhost/$port) 2>/dev/null; then
                 echo "$module_name is ready."
                 return 0
             fi

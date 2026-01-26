@@ -144,10 +144,10 @@ parse_args "$@"
 # Default to current directory if not specified
 PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 
-# Common blocked paths for all platforms
-BLOCKED_PATHS=(
+# System paths - block entire directory tree (protects against symlink attacks)
+# Example: /etc and /etc/passwd are both blocked
+SYSTEM_BLOCKED_PATHS=(
     "/"
-    "$HOME"
     "/bin"
     "/boot"
     "/dev"
@@ -161,26 +161,35 @@ BLOCKED_PATHS=(
     "/sbin"
     "/srv"
     "/sys"
-    "/tmp"
     "/usr"
     "/var"
 )
 
-# Add platform-specific blocked paths
+# Root paths - block exact path only (allows subdirectories for user projects)
+# Example: /Users is blocked but /Users/john/projects is allowed
+ROOT_BLOCKED_PATHS=(
+    "$HOME"
+    "/tmp"
+)
+
+# Add platform-specific paths
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS-specific paths
-    BLOCKED_PATHS+=(
-        "/Applications"
+    # macOS system paths (block entire tree)
+    SYSTEM_BLOCKED_PATHS+=(
         "/Library"
         "/System"
-        "/Users"
-        "/Volumes"
+        "/Applications"
         "/net"
         "/private"
     )
+    # macOS root paths (exact match only)
+    ROOT_BLOCKED_PATHS+=(
+        "/Users"
+        "/Volumes"
+    )
 else
-    # Linux-specific paths (includes WSL)
-    BLOCKED_PATHS+=(
+    # Linux root paths (exact match only)
+    ROOT_BLOCKED_PATHS+=(
         "/home"
         "/mnt"
         "/media"
@@ -188,19 +197,33 @@ else
     )
 fi
 
-for blocked in "${BLOCKED_PATHS[@]}"; do
-    if [ "$PROJECT_DIR" = "$blocked" ]; then
-        echo "Mounting $blocked is not allowed for security reasons"
-        exit 1
-    fi
-done
-
+# Check if directory exists first
 if [ ! -d "$PROJECT_DIR" ]; then
     echo "Directory not found: $PROJECT_DIR"
     exit 1
 fi
 
-PROJECT_DIR=$(cd "$PROJECT_DIR" && pwd)
+# Resolve symlinks BEFORE checking blocked paths to prevent bypass attacks
+# Example attack: ln -s /etc /tmp/safe-dir/etc-link && claude-safe /tmp/safe-dir/etc-link
+# Use pwd -P to resolve symlinks (pwd alone preserves logical path on macOS)
+PROJECT_DIR=$(cd "$PROJECT_DIR" && pwd -P)
+
+# Check system paths (block entire tree)
+for blocked in "${SYSTEM_BLOCKED_PATHS[@]}"; do
+    if [ "$PROJECT_DIR" = "$blocked" ] || [[ "$PROJECT_DIR" == "$blocked"/* ]]; then
+        echo "Mounting $PROJECT_DIR is not allowed for security reasons"
+        exit 1
+    fi
+done
+
+# Check root paths (exact match only)
+for blocked in "${ROOT_BLOCKED_PATHS[@]}"; do
+    if [ "$PROJECT_DIR" = "$blocked" ]; then
+        echo "Mounting $PROJECT_DIR is not allowed for security reasons"
+        exit 1
+    fi
+done
+
 PROJECT_NAME=$(basename "$PROJECT_DIR")
 
 echo "Claude Safe"
