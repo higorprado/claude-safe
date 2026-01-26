@@ -10,6 +10,12 @@ get_mcp_config_path() {
     echo "/tmp/claude-safe-mcp-config.json"
 }
 
+# Run jq using a lightweight dedicated container
+# This avoids host dependencies (WSL issue)
+run_jq() {
+    docker run --rm -i ghcr.io/jqlang/jq:latest "$@"
+}
+
 # Read current MCP config from Docker volume
 read_mcp_config() {
     local temp_file=$(get_mcp_config_path)
@@ -18,7 +24,7 @@ read_mcp_config() {
     docker run --rm -v claude-data:/persist alpine cat /persist/claude_token.json 2>/dev/null > "$temp_file" || echo "{}" > "$temp_file"
 
     # Ensure it's valid JSON
-    if ! jq empty "$temp_file" 2>/dev/null; then
+    if ! run_jq empty "$temp_file" 2>/dev/null; then
         echo "{}" > "$temp_file"
     fi
 
@@ -50,7 +56,7 @@ configure_mcp_server() {
     local module_mcp_config
     module_mcp_config=$(cat "$mcp_json_file")
 
-    if ! echo "$module_mcp_config" | jq empty 2>/dev/null; then
+    if ! echo "$module_mcp_config" | run_jq empty 2>/dev/null; then
         echo "Invalid JSON in $mcp_json_file"
         return 1
     fi
@@ -60,13 +66,13 @@ configure_mcp_server() {
     current_config=$(read_mcp_config)
 
     # Ensure mcpServers key exists
-    if ! echo "$current_config" | jq -e '.mcpServers' > /dev/null 2>&1; then
-        current_config=$(echo "$current_config" | jq '. + {"mcpServers": {}}')
+    if ! echo "$current_config" | run_jq -e '.mcpServers' > /dev/null 2>&1; then
+        current_config=$(echo "$current_config" | run_jq '. + {"mcpServers": {}}')
     fi
 
     # Merge module's MCP servers into current config
     local new_config
-    new_config=$(echo "$current_config" | jq --argjson mcp "$module_mcp_config" '.mcpServers += $mcp')
+    new_config=$(echo "$current_config" | run_jq --argjson mcp "$module_mcp_config" '.mcpServers += $mcp')
 
     # Write back
     write_mcp_config "$new_config"
@@ -83,13 +89,13 @@ remove_mcp_server() {
     current_config=$(read_mcp_config)
 
     # Check if mcpServers exists
-    if ! echo "$current_config" | jq -e '.mcpServers' > /dev/null 2>&1; then
+    if ! echo "$current_config" | run_jq -e '.mcpServers' > /dev/null 2>&1; then
         return 0
     fi
 
     # Remove the module's server
     local new_config
-    new_config=$(echo "$current_config" | jq "del(.mcpServers.$module_name)")
+    new_config=$(echo "$current_config" | run_jq "del(.mcpServers.$module_name)")
 
     # Write back
     write_mcp_config "$new_config"
@@ -103,5 +109,5 @@ list_mcp_servers() {
     current_config=$(read_mcp_config)
 
     echo "Configured MCP servers:"
-    echo "$current_config" | jq -r '.mcpServers // {} | keys[]' 2>/dev/null || echo "  (none)"
+    echo "$current_config" | run_jq -r '.mcpServers // {} | keys[]' 2>/dev/null || echo "  (none)"
 }
