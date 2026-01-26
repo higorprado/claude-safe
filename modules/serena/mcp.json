@@ -1,0 +1,6 @@
+{
+  "serena": {
+    "type": "sse",
+    "url": "http://localhost:9121/sse"
+  }
+}

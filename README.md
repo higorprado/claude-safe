@@ -92,6 +92,55 @@ You can also specify the target directory:
 claude-safe ~/Code/another-project
 ```
 
+## Modules (Optional)
+
+Claude Code has a native plugin system for MCP servers. Claude-Safe offers an **alternative module system** that runs MCP servers in isolated Docker containers.
+
+### Why Use Modules?
+
+- **Full isolation**: MCP servers run in separate containers, not on your host
+- **Clean system**: No dependencies installed on your machine
+- **Custom modules**: Run MCP servers that aren't in the official marketplace
+- **Version control**: Use a specific version different from what's available as a plugin
+- **Consistent environment**: Same setup across different machines
+
+### Available Modules
+
+| Module | Description |
+|--------|-------------|
+| `serena` | AI coding assistant with semantic code understanding |
+
+### Managing Modules
+
+```bash
+# List available modules
+claude-safe --modules
+
+# Enable a module (pulls image, configures MCP)
+claude-safe --enable serena
+
+# Disable a module (stops container, keeps image for fast re-enable)
+claude-safe --disable serena
+
+# Remove a module completely (removes image and volumes)
+claude-safe --remove serena
+
+# Show module status
+claude-safe --status
+```
+
+### How Modules Work
+
+1. **Enable** (`--enable`): Pulls the Docker image and configures Claude Code's MCP settings
+2. **Disable** (`--disable`): Stops the container and removes MCP config (keeps image for fast re-enable)
+3. **Remove** (`--remove`): Full cleanup - removes image, volumes, and all module data
+
+When you run `claude-safe`, enabled modules start as sidecar containers that share your workspace directory. When you exit, module containers are automatically stopped.
+
+### Creating Custom Modules
+
+See `modules/_template/README.md` for instructions on creating your own modules.
+
 ## How It Works
 
 *   **Secure Architecture**: Runs on `ubuntu:24.04` but drops privileges to a standard user (`claude`, UID 1000) using `gosu`. This ensures the application doesn't run as root.
@@ -131,18 +180,20 @@ Make sure Docker is running. On macOS/Windows, open Docker Desktop. On Linux, en
 
 ## Uninstall
 
-To remove everything from your system:
+To completely remove Claude Safe and all associated data:
 
 ```bash
-# 1. Remove the executable
-rm ~/bin/claude-safe
-
-# 2. Remove the Docker image
-docker rmi claude-safe:latest
-
-# 3. Remove the persistent data (WARNING: logs you out)
-docker volume rm claude-data
+claude-safe --uninstall
 ```
+
+This will:
+- Remove all module Docker images and volumes
+- Remove the Claude Safe Docker image
+- Remove your Claude authentication (you'll need to re-login if you reinstall)
+- Remove all configuration files
+- Remove the `claude-safe` executable
+
+You'll be asked to confirm before anything is deleted.
 
 ## License
 

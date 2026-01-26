@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+**/.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Serena (auto-generated)
+.serena/
+
+# Temporary files
+TODO
+*.tmp
+*.bak
