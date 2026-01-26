@@ -1,8 +1,34 @@
+# Git
 .git
+.gitignore
+
+# OS
 .DS_Store
-*.log
+
+# IDEs
 .idea
 .vscode
+
+# Logs
+*.log
+
+# Documentation (not needed in image)
 README.md
+LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+
+# Scripts (not needed in image)
 install.sh
 claude-safe.sh
+
+# Modules (managed separately)
+modules/
+
+# Serena (auto-generated)
+.serena/
+
+# Temporary files
+TODO
+*.tmp
+*.bak

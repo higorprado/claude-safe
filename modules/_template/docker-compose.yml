@@ -1,0 +1,23 @@
+# Docker Compose Template for Claude Safe Modules
+# Customize this for your module
+
+services:
+  my-module:
+    image: my-registry/my-image:latest
+    container_name: claude-safe-my-module
+    restart: unless-stopped
+    volumes:
+      # Workspace is passed from claude-safe
+      - ${WORKSPACE_DIR:-.}:/workspace
+      # Optional: Mount host config directory for persistent settings
+      # - ${CLAUDE_SAFE_DIR}/my-module/config:/app/config
+    environment:
+      # Tell the module where to find the workspace
+      - MY_MODULE_WORKSPACE=/workspace
+    # Add the command to start the MCP server
+    # command: my-module start-server --port 8080
+    # Don't set working_dir - let the container use its default
+    # (many containers expect to start in /app where their code lives)
+    # Use host network for seamless localhost access
+    # Note: ports section is not needed with host network mode
+    network_mode: host

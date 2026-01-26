@@ -1,0 +1,11 @@
+services:
+  serena:
+    image: ghcr.io/oraios/serena:latest
+    container_name: claude-safe-serena
+    restart: unless-stopped
+    volumes:
+      - ${WORKSPACE_DIR:-.}:/workspace
+      - ${CLAUDE_SAFE_DIR}/serena/config:/workspaces/serena/config
+    # Don't set working_dir - entrypoint needs /workspaces/serena for .venv
+    command: serena start-mcp-server --transport sse --port 9121 --project /workspace --context claude-code --open-web-dashboard false
+    network_mode: host

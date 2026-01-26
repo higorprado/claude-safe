@@ -11,6 +11,7 @@ RUN apt-get update && \
     nodejs \
     vim \
     gosu \
+    jq \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -20,6 +21,11 @@ RUN curl -fsSL https://claude.ai/install.sh | bash && \
 RUN userdel -r ubuntu || true
 
 RUN useradd -m -s /bin/bash -u 1000 claude
+
+# Create directory and symlink expected by Claude Code native install
+RUN mkdir -p /home/claude/.local/bin && \
+    ln -s /usr/local/bin/claude /home/claude/.local/bin/claude && \
+    chown -R claude:claude /home/claude/.local
 
 WORKDIR /workspace
 RUN chown claude:claude /workspace
