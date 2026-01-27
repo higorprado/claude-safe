@@ -42,7 +42,7 @@ show_help() {
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --help|-h)
+            --help | -h)
                 show_help
                 exit 0
                 ;;
@@ -236,14 +236,14 @@ PROJECT_NAME=$(basename "$PROJECT_DIR")
 echo "Claude Safe"
 echo "Project: $PROJECT_NAME"
 
-if ! docker info > /dev/null 2>&1; then
+if ! docker info >/dev/null 2>&1; then
     echo "Docker does not seem to be running. Please start Docker and try again."
     exit 1
 fi
 
-if ! docker volume create claude-data > /dev/null 2>&1; then
+if ! docker volume create claude-data >/dev/null 2>&1; then
     # Volume likely already exists, which is fine
-    if ! docker volume inspect claude-data > /dev/null 2>&1; then
+    if ! docker volume inspect claude-data >/dev/null 2>&1; then
         echo "Failed to create or access Docker volume 'claude-data'"
         exit 1
     fi

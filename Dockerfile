@@ -2,8 +2,11 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3008
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     curl \
     git \
     python3 \

@@ -15,12 +15,12 @@ link_folder() {
     local persist_name=$2
 
     mkdir -p "$PERSIST_DIR/$persist_name"
-    
+
     mkdir -p "$(dirname "$internal_path")"
-    
+
     rm -rf "$internal_path"
     ln -s "$PERSIST_DIR/$persist_name" "$internal_path"
-    
+
     chown -h "$USERNAME:$USERNAME" "$internal_path"
 }
 
@@ -29,7 +29,7 @@ link_file() {
     local persist_name=$2
 
     if [ ! -s "$PERSIST_DIR/$persist_name" ]; then
-        echo "{}" > "$PERSIST_DIR/$persist_name"
+        echo "{}" >"$PERSIST_DIR/$persist_name"
         chown "$USERNAME:$USERNAME" "$PERSIST_DIR/$persist_name"
     fi
 
@@ -44,7 +44,7 @@ link_folder "$USER_HOME/.claude" "dot_claude"
 link_folder "$USER_HOME/.local/state" "local_state"
 link_folder "$USER_HOME/.local/share" "local_share"
 link_folder "$USER_HOME/.cache" "cache_root"
-link_file   "$USER_HOME/.claude.json" "claude_token.json"
+link_file "$USER_HOME/.claude.json" "claude_token.json"
 
 chown -R "$USERNAME:$USERNAME" "$PERSIST_DIR"
 
