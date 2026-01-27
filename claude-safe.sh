@@ -175,17 +175,24 @@ ROOT_BLOCKED_PATHS=(
 # Add platform-specific paths
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS system paths (block entire tree)
+    # Note: /private/var/folders is excluded (user temp directories)
     SYSTEM_BLOCKED_PATHS+=(
         "/Library"
         "/System"
         "/Applications"
         "/net"
-        "/private"
+        "/private/etc"
+        "/private/var/db"
+        "/private/var/log"
+        "/private/var/root"
+        "/private/tmp"
     )
     # macOS root paths (exact match only)
     ROOT_BLOCKED_PATHS+=(
         "/Users"
         "/Volumes"
+        "/private"
+        "/private/var"
     )
 else
     # Linux root paths (exact match only)

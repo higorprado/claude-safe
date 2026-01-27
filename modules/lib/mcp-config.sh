@@ -13,7 +13,7 @@ get_mcp_config_path() {
 # Run jq using a lightweight dedicated container
 # This avoids host dependencies (WSL issue)
 run_jq() {
-    docker run --rm -i ghcr.io/jqlang/jq:latest "$@"
+    docker run --rm -i ghcr.io/jqlang/jq:1.8.1 "$@"
 }
 
 # Read current MCP config from Docker volume
@@ -21,7 +21,7 @@ read_mcp_config() {
     local temp_file=$(get_mcp_config_path)
 
     # Extract config from Docker volume
-    docker run --rm -v claude-data:/persist alpine cat /persist/claude_token.json 2>/dev/null > "$temp_file" || echo "{}" > "$temp_file"
+    docker run --rm -v claude-data:/persist alpine:3.21 cat /persist/claude_token.json 2>/dev/null > "$temp_file" || echo "{}" > "$temp_file"
 
     # Ensure it's valid JSON
     if ! run_jq empty "$temp_file" 2>/dev/null; then
@@ -39,7 +39,7 @@ write_mcp_config() {
     echo "$config" > "$temp_file"
 
     # Copy back to Docker volume
-    docker run --rm -v claude-data:/persist -v "$temp_file:/tmp/config.json" alpine sh -c "cat /tmp/config.json > /persist/claude_token.json"
+    docker run --rm -v claude-data:/persist -v "$temp_file:/tmp/config.json" alpine:3.21 sh -c "cat /tmp/config.json > /persist/claude_token.json"
 }
 
 # Configure an MCP server from a module's mcp.json
