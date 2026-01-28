@@ -19,9 +19,9 @@ mkdir -p "$SERENA_CONFIG_DIR"
 if [ ! -f "$SERENA_CONFIG_DIR/serena_config.yml" ]; then
     echo "Creating default Serena configuration..."
     # First, extract the default config from the Serena container
-    docker run --rm "$MODULE_IMAGE" cat /workspaces/serena/config/serena_config.yml > "$SERENA_CONFIG_DIR/serena_config.yml" 2>/dev/null || {
+    docker run --rm "$MODULE_IMAGE" cat /workspaces/serena/config/serena_config.yml >"$SERENA_CONFIG_DIR/serena_config.yml" 2>/dev/null || {
         echo "Warning: Could not extract default config, creating minimal config..."
-        cat > "$SERENA_CONFIG_DIR/serena_config.yml" << 'EOF'
+        cat >"$SERENA_CONFIG_DIR/serena_config.yml" <<'EOF'
 # Serena Configuration for Claude Safe
 # Generated from Serena defaults
 

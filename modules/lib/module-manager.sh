@@ -11,8 +11,8 @@ print_header() {
     local title="$1"
     local width=60
     local title_len=${#title}
-    local padding=$(( (width - title_len) / 2 ))
-    local padding_right=$(( width - title_len - padding ))
+    local padding=$(((width - title_len) / 2))
+    local padding_right=$((width - title_len - padding))
 
     echo ""
     echo "╔$(printf '═%.0s' $(seq 1 $width))╗"
@@ -144,7 +144,7 @@ enable_module() {
     fi
 
     # Add to enabled modules
-    echo "$module_name" >> "$ENABLED_MODULES_FILE"
+    echo "$module_name" >>"$ENABLED_MODULES_FILE"
 
     print_footer
     print_success "Module '${MODULE_DISPLAY_NAME:-$module_name}' enabled successfully."
@@ -191,7 +191,7 @@ disable_module() {
 
     # Remove from enabled modules
     local temp_file=$(mktemp)
-    grep -vx "$module_name" "$ENABLED_MODULES_FILE" > "$temp_file" 2>/dev/null || true
+    grep -vx "$module_name" "$ENABLED_MODULES_FILE" >"$temp_file" 2>/dev/null || true
     mv "$temp_file" "$ENABLED_MODULES_FILE"
 
     print_footer
@@ -237,7 +237,7 @@ start_module_container() {
         local retries=30
         while [ $retries -gt 0 ]; do
             # Check if port is open using bash's built-in /dev/tcp (no external tools needed)
-            if (echo > /dev/tcp/localhost/$port) 2>/dev/null; then
+            if (echo >/dev/tcp/localhost/$port) 2>/dev/null; then
                 echo "$module_name is ready."
                 return 0
             fi
@@ -299,7 +299,7 @@ remove_module() {
         source "$MODULES_DIR/lib/mcp-config.sh"
         remove_mcp_server "$module_name"
         local temp_file=$(mktemp)
-        grep -vx "$module_name" "$ENABLED_MODULES_FILE" > "$temp_file" 2>/dev/null || true
+        grep -vx "$module_name" "$ENABLED_MODULES_FILE" >"$temp_file" 2>/dev/null || true
         mv "$temp_file" "$ENABLED_MODULES_FILE"
     else
         # Still stop container if running

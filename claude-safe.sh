@@ -42,7 +42,7 @@ show_help() {
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --help|-h)
+            --help | -h)
                 show_help
                 exit 0
                 ;;
@@ -175,17 +175,24 @@ ROOT_BLOCKED_PATHS=(
 # Add platform-specific paths
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS system paths (block entire tree)
+    # Note: /private/var/folders is excluded (user temp directories)
     SYSTEM_BLOCKED_PATHS+=(
         "/Library"
         "/System"
         "/Applications"
         "/net"
-        "/private"
+        "/private/etc"
+        "/private/var/db"
+        "/private/var/log"
+        "/private/var/root"
+        "/private/tmp"
     )
     # macOS root paths (exact match only)
     ROOT_BLOCKED_PATHS+=(
         "/Users"
         "/Volumes"
+        "/private"
+        "/private/var"
     )
 else
     # Linux root paths (exact match only)
@@ -229,14 +236,14 @@ PROJECT_NAME=$(basename "$PROJECT_DIR")
 echo "Claude Safe"
 echo "Project: $PROJECT_NAME"
 
-if ! docker info > /dev/null 2>&1; then
+if ! docker info >/dev/null 2>&1; then
     echo "Docker does not seem to be running. Please start Docker and try again."
     exit 1
 fi
 
-if ! docker volume create claude-data > /dev/null 2>&1; then
+if ! docker volume create claude-data >/dev/null 2>&1; then
     # Volume likely already exists, which is fine
-    if ! docker volume inspect claude-data > /dev/null 2>&1; then
+    if ! docker volume inspect claude-data >/dev/null 2>&1; then
         echo "Failed to create or access Docker volume 'claude-data'"
         exit 1
     fi

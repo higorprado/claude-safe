@@ -1,5 +1,7 @@
 services:
   serena:
+    # Using 'latest' because serena has no stable version tags
+    # Monitor https://github.com/oraios/serena for version releases
     image: ghcr.io/oraios/serena:latest
     container_name: claude-safe-serena
     restart: unless-stopped

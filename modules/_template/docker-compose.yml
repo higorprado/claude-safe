@@ -3,7 +3,8 @@
 
 services:
   my-module:
-    image: my-registry/my-image:latest
+    # Always pin to a specific version tag for reproducibility
+    image: my-registry/my-image:1.0.0
     container_name: claude-safe-my-module
     restart: unless-stopped
     volumes:
