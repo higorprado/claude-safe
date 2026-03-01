@@ -75,13 +75,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@bc61dc55704e2d5704760f3cdab0d09acf16e4ca
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
-          version: 'v0.68.1'
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/workdir" \
+            -w /workdir \
+            aquasec/trivy:0.68.1 \
+            fs --exit-code 1 --severity CRITICAL,HIGH --no-progress .
 
   docker-build:
     name: Docker Build Test
